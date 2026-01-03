@@ -2,7 +2,7 @@
 
 All notable changes to the GitButler VSCode extension will be documented in this file.
 
-## [0.1.0] - 2026-01-03
+## [0.1.0] - TBD
 
 ### Added
 

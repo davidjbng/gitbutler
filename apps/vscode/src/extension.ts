@@ -5,6 +5,17 @@ import * as path from 'path';
 
 let treeDataProvider: GitButlerTreeDataProvider | undefined;
 let cli: GitButlerCLI | undefined;
+let refreshTimeout: NodeJS.Timeout | undefined;
+
+// Debounced refresh to prevent excessive updates
+function debouncedRefresh() {
+	if (refreshTimeout) {
+		clearTimeout(refreshTimeout);
+	}
+	refreshTimeout = setTimeout(() => {
+		void refreshStatus();
+	}, 500);
+}
 
 export async function activate(context: vscode.ExtensionContext) {
 	// Get the workspace folder
@@ -42,18 +53,26 @@ export async function activate(context: vscode.ExtensionContext) {
 	// Initial load
 	await refreshStatus();
 
-	// Watch for file changes to refresh status
-	const fileWatcher = vscode.workspace.createFileSystemWatcher('**/*');
-	fileWatcher.onDidChange(async () => await refreshStatus());
-	fileWatcher.onDidCreate(async () => await refreshStatus());
-	fileWatcher.onDidDelete(async () => await refreshStatus());
-	context.subscriptions.push(fileWatcher);
+	// Watch for Git-related file changes to refresh status
+	// Only watch .git and .gitbutler directories to avoid excessive refreshes
+	const gitWatcher = vscode.workspace.createFileSystemWatcher('**/.git/**');
+	const gitbutlerWatcher = vscode.workspace.createFileSystemWatcher('**/.gitbutler/**');
+
+	gitWatcher.onDidChange(() => debouncedRefresh());
+	gitWatcher.onDidCreate(() => debouncedRefresh());
+	gitWatcher.onDidDelete(() => debouncedRefresh());
+	gitbutlerWatcher.onDidChange(() => debouncedRefresh());
+	gitbutlerWatcher.onDidCreate(() => debouncedRefresh());
+	gitbutlerWatcher.onDidDelete(() => debouncedRefresh());
+
+	context.subscriptions.push(gitWatcher);
+	context.subscriptions.push(gitbutlerWatcher);
 
 	// Also refresh on window focus
 	context.subscriptions.push(
-		vscode.window.onDidChangeWindowState((state) => {
+		vscode.window.onDidChangeWindowState(async (state) => {
 			if (state.focused) {
-				refreshStatus();
+				await refreshStatus();
 			}
 		})
 	);
