@@ -1,6 +1,5 @@
-import { spawn } from 'child_process';
-import * as path from 'path';
 import { WorkspaceStatus } from './types';
+import { spawn } from 'child_process';
 
 /**
  * Utility class for executing GitButler CLI commands
@@ -19,7 +18,7 @@ export class GitButlerCLI {
 	 * Execute a GitButler CLI command with JSON output
 	 */
 	private async executeCommand(args: string[]): Promise<string> {
-		return new Promise((resolve, reject) => {
+		return await new Promise((resolve, reject) => {
 			const allArgs = ['-C', this.workingDir, '--json', ...args];
 			const process = spawn(this.butPath, allArgs);
 
@@ -69,7 +68,7 @@ export class GitButlerCLI {
 			// Try to execute status command - if it fails, it's not a GitButler repo
 			await this.executeCommand(['status']);
 			return true;
-		} catch (error) {
+		} catch {
 			return false;
 		}
 	}

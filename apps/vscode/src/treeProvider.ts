@@ -1,4 +1,3 @@
-import * as vscode from 'vscode';
 import {
 	WorkspaceStatus,
 	Stack,
@@ -8,6 +7,7 @@ import {
 	BranchStatus,
 	ChangeType
 } from './types';
+import * as vscode from 'vscode';
 
 /**
  * Tree item types for different levels in the hierarchy
@@ -48,23 +48,25 @@ export class GitButlerTreeItem extends vscode.TreeItem {
 				this.contextValue = 'stack';
 				break;
 
-			case TreeItemType.Branch:
+			case TreeItemType.Branch: {
 				const branch = this.data as Branch;
 				this.iconPath = new vscode.ThemeIcon('git-branch');
 				this.contextValue = 'branch';
 				this.description = this.getBranchDescription(branch);
 				this.tooltip = this.getBranchTooltip(branch);
 				break;
+			}
 
-			case TreeItemType.Commit:
+			case TreeItemType.Commit: {
 				const commit = this.data as Commit;
 				this.iconPath = new vscode.ThemeIcon('git-commit');
 				this.contextValue = 'commit';
 				this.description = this.formatCommitDate(commit.createdAt);
 				this.tooltip = this.getCommitTooltip(commit);
 				break;
+			}
 
-			case TreeItemType.File:
+			case TreeItemType.File: {
 				const file = this.data as FileChange;
 				this.iconPath = this.getFileIcon(file.changeType);
 				this.contextValue = 'file';
@@ -74,6 +76,7 @@ export class GitButlerTreeItem extends vscode.TreeItem {
 					arguments: [file.filePath]
 				};
 				break;
+			}
 
 			case TreeItemType.MergeBase:
 				this.iconPath = new vscode.ThemeIcon('git-merge');
@@ -293,7 +296,7 @@ export class GitButlerTreeDataProvider implements vscode.TreeDataProvider<GitBut
 						)
 				);
 
-			case TreeItemType.Stack:
+			case TreeItemType.Stack: {
 				const stack = element.data as Stack;
 				const items: GitButlerTreeItem[] = [];
 
@@ -322,8 +325,9 @@ export class GitButlerTreeDataProvider implements vscode.TreeDataProvider<GitBut
 				}
 
 				return items;
+			}
 
-			case TreeItemType.Branch:
+			case TreeItemType.Branch: {
 				const branch = element.data as Branch;
 				return branch.commits.map((commit) => {
 					const shortMessage = commit.message.split('\n')[0].substring(0, 80);
@@ -336,8 +340,9 @@ export class GitButlerTreeDataProvider implements vscode.TreeDataProvider<GitBut
 							: vscode.TreeItemCollapsibleState.None
 					);
 				});
+			}
 
-			case TreeItemType.Commit:
+			case TreeItemType.Commit: {
 				const commit = element.data as Commit;
 				if (commit.changes) {
 					return commit.changes.map(
@@ -351,6 +356,7 @@ export class GitButlerTreeDataProvider implements vscode.TreeDataProvider<GitBut
 					);
 				}
 				return [];
+			}
 
 			case TreeItemType.UpstreamState:
 				// Could show upstream commits here

@@ -18,7 +18,9 @@
 	"engines": {
 		"vscode": "^1.85.0"
 	},
-	"categories": ["Source Control"],
+	"categories": [
+		"Source Control"
+	],
 	"keywords": [
 		"git",
 		"gitbutler",
@@ -27,7 +29,9 @@
 		"source control",
 		"scm"
 	],
-	"activationEvents": ["onStartupFinished"],
+	"activationEvents": [
+		"onStartupFinished"
+	],
 	"main": "./dist/extension.js",
 	"contributes": {
 		"views": {

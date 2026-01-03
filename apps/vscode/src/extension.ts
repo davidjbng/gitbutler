@@ -1,18 +1,15 @@
-import * as vscode from 'vscode';
-import * as path from 'path';
 import { GitButlerCLI } from './cli';
 import { GitButlerTreeDataProvider } from './treeProvider';
+import * as vscode from 'vscode';
+import * as path from 'path';
 
 let treeDataProvider: GitButlerTreeDataProvider | undefined;
 let cli: GitButlerCLI | undefined;
 
 export async function activate(context: vscode.ExtensionContext) {
-	console.log('GitButler extension is now active');
-
 	// Get the workspace folder
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 	if (!workspaceFolders || workspaceFolders.length === 0) {
-		console.log('No workspace folder found, GitButler extension will not activate');
 		return;
 	}
 
@@ -24,7 +21,6 @@ export async function activate(context: vscode.ExtensionContext) {
 	// Check if it's a GitButler repository
 	const isGitButlerRepo = await cli.isGitButlerRepo();
 	if (!isGitButlerRepo) {
-		console.log('Not a GitButler repository, extension features disabled');
 		// Still register commands but they'll show helpful messages
 		registerCommands(context, false);
 		return;
@@ -48,9 +44,9 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// Watch for file changes to refresh status
 	const fileWatcher = vscode.workspace.createFileSystemWatcher('**/*');
-	fileWatcher.onDidChange(() => refreshStatus());
-	fileWatcher.onDidCreate(() => refreshStatus());
-	fileWatcher.onDidDelete(() => refreshStatus());
+	fileWatcher.onDidChange(async () => await refreshStatus());
+	fileWatcher.onDidCreate(async () => await refreshStatus());
+	fileWatcher.onDidDelete(async () => await refreshStatus());
 	context.subscriptions.push(fileWatcher);
 
 	// Also refresh on window focus
@@ -113,7 +109,7 @@ function registerCommands(context: vscode.ExtensionContext, isGitButlerRepo: boo
 			try {
 				const document = await vscode.workspace.openTextDocument(fullPath);
 				await vscode.window.showTextDocument(document);
-			} catch (error) {
+			} catch {
 				vscode.window.showErrorMessage(`Failed to open file: ${filePath}`);
 			}
 		})
@@ -128,13 +124,12 @@ async function refreshStatus() {
 	try {
 		const status = await cli.getStatus(true);
 		treeDataProvider.updateStatus(status);
-	} catch (error) {
-		console.error('Failed to refresh GitButler status:', error);
+	} catch {
 		// Don't show error to user on every refresh, just log it
 		// User can manually refresh if they want
 	}
 }
 
 export function deactivate() {
-	console.log('GitButler extension is now deactivated');
+	// Extension deactivated
 }

@@ -5,6 +5,7 @@ All notable changes to the GitButler VSCode extension will be documented in this
 ## [0.1.0] - 2026-01-03
 
 ### Added
+
 - Initial release of GitButler VSCode extension
 - Virtual branches tree view in Source Control panel
 - Display of commits for each branch with author and date information

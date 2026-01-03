@@ -48,6 +48,7 @@ but status --json --files
 ```
 
 This provides structured data about:
+
 - Virtual branches and their stacks
 - Commits on each branch
 - File changes (uncommitted and committed)
