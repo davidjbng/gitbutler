@@ -82,6 +82,9 @@ GitButler is a [Tauri](https://tauri.app/)-based application. Its UI is written 
   - Logs all operations and changes and allows you to easily undo or revert any operation
 - **GitHub Integration**
   - Authenticate to GitHub to open Pull Requests, list branches and statuses and more
+- **VSCode Extension**
+  - Visualize virtual branches, commits, and files directly in VSCode
+  - See [apps/vscode](apps/vscode) for more information
 - **Easy SSH Key Management**
   - GitButler can generate an SSH key to upload to GitHub automatically
 - **AI Tooling**
